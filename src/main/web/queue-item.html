@@ -1,0 +1,37 @@
+<md-dialog aria-label="{{item.title}}" ng-cloak layout-fill>
+	<md-toolbar class="md-primary" ng-class="live ?'md-primary':'md-warn'">
+		<div class="md-toolbar-tools">
+			<div layout="column">
+				<h2>Log:<b>{{item.title}}</b></h2>
+				<p ng-if="!live" style="margin: 0;font-size: 50%;">PROCESS HAS BEEN REMOVED FROM THE QUEUE</p>
+			</div>
+			<span flex></span>
+			<md-button class="md-icon-button trans-scale" ng-click="refresh()" ng-class="{ visible: live }">
+				<md-icon aria-label="Refresh">refresh</md-icon>
+			</md-button>
+			<md-button class="md-icon-button" ng-click="cancel()">
+				<md-icon aria-label="Close">clear</md-icon>
+			</md-button>
+		</div>
+	</md-toolbar>
+	<md-dialog-content class="queue-item" layout-padding flex>	
+		<div>
+			<p class="md-body-1">
+				<b ng-if="item.warnings > 0" class="ecount">W [ {{item.warnings}} ]</b>
+				<b ng-if="item.errors > 0" class="ecount">E [ {{item.errors}} ]</b>
+				{{item.description}}</p>
+			<p class="md-body-1">{{item.action}} {{item.info}}</p>
+			<p class="md-body-1">
+				<span ng-if="item.times.start == 0">Queued since: <b>{{item.times.submitted | date:'HH:mm:ss'}}</b> for <b>{{item.times.queued | date: 'H:mm:ss': 'UTC'}}</b> (HH:m:ss)</span>
+				<span ng-if="item.times.start != 0 && item.times.end == 0">Processing since <b>{{item.times.start | date:'HH:mm:ss'}}</b> for <b>{{item.times.duration | date: 'H:mm:ss': 'UTC'}}</b> (HH:m:ss)</span>
+				<span ng-if="item.times.start != 0 && item.times.end != 0">Completed at <b>{{item.times.end | date:'HH:mm:ss'}}</b> in <b>{{item.times.duration | date: 'H:mm:ss': 'UTC'}}</b> (HH:m:ss)</span>
+			</p>
+			<md-progress-linear class="md-accent progress trans-scale-x" ng-class="{ visible: item.percent > 0 && item.percent < 1 }" md-mode="determinate" value="{{item.percent * 100}}"></md-progress-linear>
+		</div>
+		<md-content>
+		<pre style="font-size:80%;"><span ng-repeat="log in item.logs.slice().reverse() track by log.id">
+{{log.message}}</span>
+		</pre>
+		</md-content>
+	</md-dialog-content>
+</md-dialog>

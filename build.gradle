@@ -1,0 +1,198 @@
+import org.apache.tools.ant.filters.ReplaceTokens 
+
+apply plugin: 'eclipse-wtp'
+apply plugin: 'war'
+
+/*
+* Specific Project Dependencies
+* 
+* - providedCompile - will be added to the parent service
+* - endorsed - also on parent (and endorsed of course)
+* - compile - included in WAR as expected
+*/
+dependencies {
+	//providedCompile 'x:x:x'
+	 compile 'org.mvel:mvel2:2.2.2.Final'
+}
+
+task preRelease(){
+	description "This task is hook to the main release task - it can be replace with your own code."
+}
+
+/**
+* SERVICE BUILDING DEFINITION (BELOW) 
+**/
+
+configurations{
+	endorsed
+}
+
+// (re)load the gradle file for tokens
+def tokens = new Properties()
+tokens.load(file('gradle.properties').newDataInputStream())
+
+def releaseDir=file("${project.buildDir}/release/${SERVICENAME}/")
+def libDir=new File(releaseDir,'lib')
+def endDir=new File(releaseDir,'lib-endorsed')
+def binDir=new File(releaseDir,'bin')
+def wrpDir=new File("src/wrapper/resources/")
+def pubDir=new File("${project.buildDir}/publish/")
+
+webAppDirName = 'src/main/web/'
+
+task serviceRun(type: JavaExec,dependsOn: 'serviceBuild'){
+	description 'Runs the project - depends on serviceBuild.'
+	println "Service will be available on - http://localhost:${PORT}/${CONTEXT}/"
+	main MAIN_CLASS
+	classpath sourceSets.main.runtimeClasspath
+	workingDir binDir
+	maxHeapSize "${MAXMEMORY}m"
+	args "${PORT}","../web/","true"
+}
+
+task serviceStop(){
+	description 'Stops the web project.'
+	doLast{
+		ant.get(src: "http://localhost:${PORT}/${CONTEXT}/admin/SHUTDOWN", verbose:true, dest: "NUL") 
+	}
+}
+
+task serviceUpdate(dependsOn: 'war'){
+	description 'Update the war file of a running service.'
+	//This task is only here to call war (I thought it was neater).
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+	providedCompile fileTree(dir: 'libs', include: ['*.jar'])
+	// Tomcat
+	providedCompile "org.apache.tomcat.embed:tomcat-embed-core:${WEB_VERSION}"
+	providedCompile "org.apache.tomcat.embed:tomcat-embed-logging-juli:${WEB_VERSION}"
+	providedCompile "org.apache.tomcat.embed:tomcat-embed-jasper:${WEB_VERSION}"
+	//
+	//providedCompile "org.apache.activemq:activemq-all:5.12.0"
+	//
+	providedCompile 'com.google.code.gson:gson:+'
+}
+
+sourceCompatibility = COMPATABILITY
+targetCompatibility = COMPATABILITY
+
+sourceSets {
+    wrapper {
+        resources {
+            srcDir wrpDir
+        }
+    }
+    web{
+    	resources {
+    		srcDir webAppDirName
+    	}
+    }
+}
+
+eclipse {
+	wtp {
+		component {
+			contextPath = "${CONTEXT}"
+		}
+	}
+}
+
+task launcher(type: Jar) {
+	description 'Creates the executable jar that launches Tomcat.'
+    from sourceSets.main.output
+    include 'org/keeber/service/start/**'
+    destinationDir libDir
+	baseName SERVICENAME
+	classifier CLASSIFIER
+	version VERSION
+	manifest { attributes 'Main-Class': MAIN_CLASS }
+}
+
+processResources {
+	filesMatching('**/*.properties') {
+		println "\treplace-in:${getName()}"
+        filter(ReplaceTokens, tokens: tokens)
+    }
+}
+
+war {   
+	archiveName "${CONTEXT}.war" 
+	destinationDir new File(releaseDir, 'web')
+	filesMatching('**/*.html') {
+		println "\treplace-in:${getName()}"
+        filter(ReplaceTokens, tokens: tokens)
+    }
+}
+
+task serviceBuild(dependsOn: ['preRelease','launcher', 'war' ]){
+	description 'Creates the service folder.'
+	doLast{
+		new File(releaseDir, 'log').mkdirs()
+		// Libs (Java and Wrapper Native)
+		copy{
+			into libDir
+			from configurations.providedCompile
+			from new File(wrpDir,"lib")
+		}
+		// Endorsed Libs (Java - from endorsed configuration)
+		copy {
+			from configurations.endorsed
+			into endDir
+		}
+		// Wrapper Binaries
+		copy{
+			into binDir
+			from new File(wrpDir,"bin")
+			fileMode 0755
+		}
+		// Configuration Files
+		copy {
+			into new File(releaseDir,'conf')
+			from new File(wrpDir,"conf")
+			from new File(webAppDirName+"/WEB-INF/conf")
+		}
+		// Build libraries entry for wrapper
+		tokens['LIB_COMPOSITE'] = ''
+		def n = 2
+		fileTree(dir: libDir, includes: ['*.jar']).each { File file ->
+			println '\tLib:'+file.name
+			tokens['LIB_COMPOSITE']=tokens['LIB_COMPOSITE']+"wrapper.java.classpath."+n+"=../lib/"+file.name+"\n";
+			n++;
+		}
+		//Endorsed
+		fileTree(dir: endDir, includes: ['*.jar']).each { File file ->
+			println '\tLib(E):'+file.name
+			tokens['LIB_COMPOSITE']=tokens['LIB_COMPOSITE']+"wrapper.java.classpath."+n+"=../lib-endorsed/"+file.name+"\n";
+			n++;
+		}
+		// Copy Wrapper Shell scripts and conf
+		copy{
+			from(new File(wrpDir,'txt')){  rename '(.+)\\.in', SERVICENAME+'.$1' }
+			into binDir
+			filter(ReplaceTokens, tokens: tokens)
+			filesMatching('**/sh.in'){
+				fileMode 0755
+			}
+		}
+		//DONE
+		println "ServiceBuild:"+VERSION+(CLASSIFIER ==""?'':'-'+CLASSIFIER)
+	}
+}
+
+task serviceDist(dependsOn: 'serviceBuild'){
+	description 'Creates the final ZIP of the service for distribution.'
+	doLast{
+		task(zipResources, type: Zip) {
+			destinationDir pubDir
+			archiveName SERVICENAME+'-'+VERSION+(CLASSIFIER ==""?'':'-'+CLASSIFIER)+'.zip'
+			from releaseDir.parent
+		}.execute()
+		//DONE
+		println "Publish:"+VERSION+(CLASSIFIER ==""?'':'-'+CLASSIFIER)
+	}
+}

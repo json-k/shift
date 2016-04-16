@@ -1,0 +1,35 @@
+<md-toolbar md-scroll-shrink class="md-primary">
+	<div class="md-toolbar-tools">
+		<md-button class="md-icon-button" ng-click="showNav()" hide-gt-sm aria-label="Menu">
+	    	<md-icon>menu</md-icon>
+		</md-button>
+		<h3><span>Queue</span></h3>
+		<span flex></span>
+		<md-button class="md-icon-button" ng-click="refresh();">
+			<md-icon aria-label="Refresh">refresh</md-icon>
+		</md-button>
+	</div>
+</md-toolbar>
+<md-content layout-fill>
+	<div class="queue-item repeat-trans-scale-y" ng-repeat="item in queue track by item.processId" layout="column"
+		ng-click="showItem($event,item);">
+		<div layout-padding flex>
+			<div layout="row" layout-align="start center">
+				<md-icon>{{item.state == 'WORKING'?'autorenew':item.state == 'COMPLETE'?'done':'schedule'}}</md-icon>
+	    		<p class="md-subhead" flex>&nbsp;{{item.title}}</p>
+			</div>
+		    <p class="md-body-1">
+				<b ng-if="item.warnings > 0" class="ecount">W [ {{item.warnings}} ]</b>
+				<b ng-if="item.errors > 0" class="ecount">E [ {{item.errors}} ]</b>
+				{{item.description}}
+			</p>
+			<p class="md-body-1">{{item.action}} {{item.info}}</p>
+			<p class="md-body-1">
+				<span ng-if="item.times.start == 0">Queued since: <b>{{item.times.submitted | date:'HH:mm:ss'}}</b> for <b>{{item.times.queued | date: 'H:mm:ss': 'UTC'}}</b> (HH:m:ss)</span>
+				<span ng-if="item.times.start != 0 && item.times.end == 0">Processing since <b>{{item.times.start | date:'HH:mm:ss'}}</b> for <b>{{item.times.duration | date: 'H:mm:ss': 'UTC'}}</b> (HH:m:ss)</span>
+				<span ng-if="item.times.start != 0 && item.times.end != 0">Completed at <b>{{item.times.end | date:'HH:mm:ss'}}</b> in <b>{{item.times.duration | date: 'H:mm:ss': 'UTC'}}</b> (HH:m:ss)</span>
+			</p>
+		</div>
+		<md-progress-linear style="margin:0" class="md-accent progress trans-scale-x" ng-class="{ visible: item.percent > 0 && item.percent < 1 }" md-mode="determinate" value="{{item.percent * 100}}"></md-progress-linear>			
+	</div>
+</md-content>

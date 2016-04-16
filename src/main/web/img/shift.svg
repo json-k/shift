@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg id="svg2" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" height="64" width="64" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/">
+ <defs id="defs4">
+  <filter id="filter4288" style="color-interpolation-filters:sRGB">
+   <feFlood id="feFlood4290" flood-color="rgb(0,0,0)" result="flood"/>
+   <feComposite id="feComposite4292" operator="in" in="flood" in2="SourceGraphic" result="composite1"/>
+   <feGaussianBlur id="feGaussianBlur4294" in="composite1" stdDeviation="0.7" result="blur"/>
+   <feOffset id="feOffset4296" dy="0" dx="0" result="offset"/>
+   <feComposite id="feComposite4298" operator="over" in="SourceGraphic" in2="offset" result="composite2"/>
+  </filter>
+  <clipPath id="clipPath4179" clipPathUnits="userSpaceOnUse">
+   <path id="path4181" style="fill:#ececec" d="m0 0v64h64v-64h-64zm32 4 28 14v28l-28 14-28-14v-28l28-14z"/>
+  </clipPath>
+ </defs>
+ <path id="rect4228" style="opacity:.112" d="m32 4 28 14v28l-28 14z"/>
+ <path id="rect4223" style="filter:url(#filter4288);fill:#fff" clip-path="url(#clipPath4179)" d="m4 18 28-14 28 14v28l-28 14-28-14z"/>
+ <path id="path4183" d="m32 4-28 14v28l28 14z" style="opacity:0.112;fill:#fff"/>
+ <g id="g4185" transform="translate(-79 -2.4051)">
+  <path id="path4167" style="fill:#fff" d="m95 21.595v7.8102l16 9v-8z"/>
+  <path id="path4707" d="m127 47.405v-8l-16-9v8z" style="fill:#ccc"/>
+  <g id="g4715" style="filter:url(#filter4288)" transform="translate(79 2.4051)">
+   <path id="rect4704" style="fill:#ccc" d="m32 19h12v-3l14 7-14 7v-3h-12z"/>
+   <rect id="rect4709" style="fill:#fff" height="8" width="16" y="19" x="16"/>
+  </g>
+  <g id="g4719" style="filter:url(#filter4288)" transform="translate(79 2.4051)">
+   <path id="path4711" d="m32 37h-12v-3l-14 7 14 7v-3h12z" style="fill:#fff"/>
+   <rect id="rect4713" style="fill:#ccc" transform="scale(-1,1)" height="8" width="16" y="37" x="-48"/>
+  </g>
+ </g>
+</svg>

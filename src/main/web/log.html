@@ -1,0 +1,22 @@
+<md-toolbar md-scroll-shrink class="md-primary" ng-cloak>
+	<div class="md-toolbar-tools">
+		<md-button class="md-icon-button" ng-click="showNav()" hide-gt-sm aria-label="Menu">
+	    	<md-icon>menu</md-icon>
+		</md-button>
+		<h3><span>Log</span></h3>
+		<span flex></span>
+		<md-button class="md-icon-button" ng-click="refresh();">
+			<md-icon aria-label="Refresh">refresh</md-icon>
+		</md-button>
+	</div>
+</md-toolbar> 
+<md-content  layout-fill>
+	<span ng-repeat="logEntry in logEntries track by logEntry.id">
+	<md-subheader class="md-accent">{{logEntry.name}}</md-subheader>
+	<md-content class="inset" md-scroll-x>
+	<pre style="font-size:80%;"><span ng-repeat="log in logEntry.logs.slice().reverse() track by log.id">
+{{log.message}}</span>
+		</pre>
+	</md-content>
+	</span>
+</md-content>

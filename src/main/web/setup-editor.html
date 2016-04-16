@@ -1,0 +1,234 @@
+<md-toolbar md-scroll-shrink class="md-primary">
+	<div class="md-toolbar-tools">
+		<div layout="column">
+			<h2>Edit:<b>{{channel.name}}</b></h2>
+			<p style="margin: 0;font-size: 50%;">ID:{{channel.id}}</p>
+		</div>
+		<span flex></span>
+		<md-button class="md-icon-button" ng-click="deleteChannel();">
+			<md-icon>delete</md-icon>
+		</md-button>
+		<md-button class="md-icon-button trans-scale" ng-class="{visible: form.$dirty && form.$valid}" ng-click="updateChannel();">
+			<md-icon aria-label="Save">save</md-icon>
+		</md-button>
+		<md-button class="md-icon-button" ng-click="go('setup');">
+			<md-icon aria-label="Cancel">cancel</md-icon>
+		</md-button>
+	</div>
+</md-toolbar>
+<md-content layout-fill class="dark-bg">
+	<ng-form name="form">
+		<md-subheader class="md-accent">Basic Configuration</md-subheader>
+		<md-card>
+			<md-card-content>
+				<div ng-show="help">
+					<p class="md-body-1">
+						Basic settings: channels must be enabled to process files.
+					</p>
+				</div>
+				<div layout="row" class="first-row">
+					<md-input-container layout-fill>
+						<label>Name</label>
+						<input ng-model="channel.name">
+					</md-input-container>
+				</div>
+				<div layout="row">
+					<md-input-container layout-fill>
+						<label>Description</label>
+						<input ng-model="channel.description">
+					</md-input-container>
+				</div>
+				<div layout="row">
+					<md-input-container layout-fill>
+						<md-switch flex ng-model="channel.enabled" aria-label="Enabled">Enabled</md-switch>
+						<div class="hint" ng-show="!channel.enabled">A disabled channel
+							will not process files.</div>
+					</md-input-container>
+				</div>
+			</md-card-content>
+		</md-card>
+		<!-- Fake repeat to make the channel configuration easier to access -->
+		<div ng-repeat="conf in [channel.configuration]">
+			<md-card>
+				<md-card-content>
+					<div ng-show="help">
+						<p class="md-body-1">This will add more detail to the log, specifically 
+						the value of variables as a file processes though the workflow.</p>
+					</div>
+					<md-input-container>
+						<md-switch flex ng-model="conf.verbose" aria-label="Verbose">Verbose</md-switch>
+					</md-input-container>
+				</md-card-content>
+			</md-card>
+			
+			<md-subheader class="md-accent">Scan Configuration</md-subheader>
+			<md-card>
+				<md-card-content>
+					<div ng-show="help">
+						<p class="md-body-1">These settings determine which folder is
+							scanned, how frequently, and for what file patterns. Only files are
+							scanned and visible sub-folders are automatically followed and
+							listed. The registered files are compared to the rules provided in
+							the 'Outputs'.</p>
+					</div>
+					<div layout="row" class="first-row">
+						<md-input-container layout-fill> <label>Path</label>
+						<input name="scanPath" ng-model="conf.scan.path" required>
+						<div ng-messages="channelForm.scanPath.$error">
+							<div ng-message="required">A valid input path must be
+								provided.</div>
+						</div>
+						</md-input-container>
+					</div>
+					<div layout="row">
+						<md-input-container flex> <label>Scan
+							Time</label> <input name="scanTime" ng-model="conf.scan.time" type="number"
+							step="1" min="{{conf.scan.unit == 'SECONDS'?'10':'1'}}">
+						<div ng-messages="channelForm.scanTime.$error">
+							<div ng-message-exp="['min']">Scan times of less that 10
+								seconds are not recommended.</div>
+						</div>
+						</md-input-container>
+						<md-input-container> <label>Unit</label> <md-select
+							ng-model="conf.scan.unit"> <md-option
+							ng-repeat="unit in ['SECONDS','MINUTES','HOURS']" value="{{unit}}">
+						{{unit}} </md-option> </md-select> </md-input-container>
+						<md-input-container flex> <label>Settle</label>
+						<input name="settleTime" ng-model="conf.scan.settle" type="number"
+							step="1" min="1">
+						<div ng-messages="channelForm.settleTime.$error">
+							<div ng-message-exp="['min']">Settle values of less than 1
+								are not recommended.</div>
+						</div>
+						</md-input-container>
+					</div>
+					<div layout="row">
+						<md-input-container layout-fill> <label>Pattern</label>
+						<input ng-model="conf.scan.pattern" required>
+						<div class="hint">Global pattern applied against every
+							(complete) file-path. (Required)</div>
+						</md-input-container>
+					</div>
+					<div>
+						<p class="md-body-1">
+							Summary: this configuration scans the folder <b>{{conf.scan.path}}</b>
+							every <b>{{conf.scan.time}} {{conf.scan.unit.toLowerCase()}}</b>.
+							Files matching "<b>{{conf.scan.pattern}}</b>" will settle for <b>{{conf.scan.settle}}</b>
+							scans (<b>{{conf.scan.time *
+								conf.scan.settle}} {{conf.scan.unit.toLowerCase()}}</b>) before being
+							registered.
+						</p>
+					</div>
+				</md-card-content>
+			</md-card>
+			<md-subheader class="md-accent">Output Configuration</md-subheader>
+			<div layout-padding ng-show="help">
+				<p class="md-body-1">Registered Files are compared against the
+					condition and regular expression in each output and then copied to
+					any of the provided locations for that output.</p>
+			</div>
+			<md-card ng-repeat="output in conf.outputs" class="repeat-trans-scale-y">
+				<md-card-title>{{output.name}}</md-card-title>
+				<md-card-content layout="column">
+					<div layout="row">
+						<md-input-container layout-fill> <label>Name</label>
+						<input ng-model="output.name"> </md-input-container>
+					</div>
+					<div layout="row">
+						<md-input-container layout-fill> <label>Value</label>
+						<input ng-model="output.value" required> </md-input-container>
+					</div>
+					<div layout="row">
+						<md-input-container layout-fill> <label>Pattern</label>
+						<input ng-model="output.pattern" required> </md-input-container>
+					</div>
+					<div>
+						<p class="md-body-1">
+							Summary: registered files where <b>{{output.value}}</b> matches <b>{{output.pattern}}</b>
+							will be copied to the defined locations.
+						</p>
+					</div>
+					<h3 class="md-title">Locations</h3>
+					<md-card class="repeat-trans-scale-y" ng-repeat="location in output.locations">
+						<md-card-title>Location {{$index + 1}}</md-card-title>
+						<md-card-content layout="column">
+							<div layout="row">
+								<md-input-container>
+									<label>Type</label>
+									<md-select ng-model="location.type">
+										<md-option ng-repeat="type in ['FILE','SMB','FTP','SFTP']" value="{{type}}"> {{type}}</md-option>
+									</md-select>
+								</md-input-container>
+							</div>
+							<span ng-show="location.type != 'FILE'">
+								<div layout="row">
+									<md-input-container layout-fill> <label>Username</label>
+									<input ng-model="location.username"> </md-input-container>
+									<span>:</span>
+									<md-input-container layout-fill> <label>Password</label>
+									<input type="password" ng-model="location.password"> </md-input-container>
+								</div>
+								<div layout="row">
+									<md-input-container layout-fill> <label>Hostname</label>
+									<input ng-model="location.hostname"> </md-input-container>
+								</div>
+							</span>
+							<div layout="row">
+								<md-input-container layout-fill> <label>Path</label>
+								<input ng-model="location.path" required> </md-input-container>
+							</div>
+							<div layout="row">
+								<md-input-container layout-fill> <label>Filename</label>
+								<input ng-model="location.filename" required> </md-input-container>
+							</div>
+						</md-card-content>
+						<md-card-actions layout="row">
+							<md-button class="md-primary md-icon-button" ng-click="deleteLocation(output,$index)">
+								<md-icon>delete</md-icon>
+							</md-button>
+						</md-card-actions>
+					</md-card>
+					
+				</md-card-content>
+				<md-card-actions layout="row">
+					<md-button class="md-primary md-icon-button" ng-click="deleteOutput($index);">
+						<md-icon>delete</md-icon>
+					</md-button>
+					<md-button class="md-primary" ng-click="newLocation(output);">
+						+Location
+					</md-button>
+				</md-card-actions>
+			</md-card>
+			<div layout="row">
+				<md-button class="md-primary"
+					ng-click="newOutput();">+Output</md-button>
+				<span flex></span>
+			</div>
+		</div>
+	</ng-form>
+	<div layout-padding ng-show="help">
+		<p class="md-body-1">Variables can be used in most of the <b>Output value</b> and in the 
+		<b>Location hostname, path, and filename</b> fields. Variables (which are 
+		<a href="https://en.wikisource.org/wiki/MVEL_Language_Guide" target="_blank">MVEL</a> scripts) are used
+		 with this syntax: ${varname}. The following variables are available:</p>
+		<table class="var-docs">
+			<thead>
+				<tr>
+					<th>Variable Name</th>
+					<th>Value</th>
+					<th>Example</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="item in varmatrix">
+					<td>${<span ng-bind="item[0]"></span>}</td><td><span ng-bind="item[1]"></span></td><td><span ng-bind="item[2]"></span></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<md-card>
+		<md-card-content>
+			<md-switch class="md-primary" ng-model="help" aria-label="Help">Help</md-switch>
+		</md-card-content>
+	</md-card>
+</md-content>

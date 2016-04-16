@@ -1,0 +1,149 @@
+.var-docs {
+	margin: 0 auto;
+	border-collapse: collapse;
+}
+
+.var-docs th {
+	text-align: left;
+	background: #9e9e9e;
+	color: #eee;
+	font-weight: bold;
+}
+
+.var-docs td, .var-docs th {
+	border: 1px solid #9e9e9e;
+	padding: 4px;
+}
+
+.var-docs td {
+	color: #9e9e9e;
+}
+
+.main-header {
+	padding: 6px;
+	text-align: center;
+	background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5) 0%,
+		rgba(0, 0, 0, 0) 100%);
+}
+
+.main-header img {
+	margin: 6px auto;
+	width: 128px;
+	height: 128px;
+}
+
+.main-header h2, .main-header h4 {
+	/*color: #fff;*/
+	margin: 0;
+}
+
+.dark-bg {
+	background: #f5f5f5;
+}
+
+.queue-item {
+	border-bottom: 1px solid #9e9e9e;
+}
+
+.queue-item div p {
+	margin-top: 3px;
+	margin-bottom: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.ecount {
+	display: inline-block;
+	background: #9e9e9e;
+	color: #fff;
+	padding: 4px;
+	border-radius: 4px;
+}
+
+.ecount::first-letter {
+	font-size: 75%;
+}
+
+.first-row {
+	margin-top: 6px;
+}
+
+.hint {
+	/* Position the hint */
+	position: absolute;
+	left: 2px;
+	right: auto;
+	bottom: 2px;
+	/* Copy styles from ng-messages */
+	font-size: 12px;
+	line-height: 14px;
+	transition: all 0.3s cubic-bezier(0.55, 0, 0.55, 0.2);
+	/* Set our own color */
+	color: grey;
+}
+
+.hint.ng-hide, .hint.ng-enter, .hint.ng-leave.ng-leave-active {
+	bottom: 26px;
+	opacity: 0;
+}
+
+.hint.ng-leave, .hint.ng-enter.ng-enter-active {
+	bottom: 2px;
+	opacity: 1;
+}
+
+/*
+* Transition effects.
+*
+* VISIBILITY
+*/
+.trans-scale.visible {
+	transform: scale(1);
+	transition: transform 0.3s linear;
+}
+
+.trans-scale {
+	transform: scale(0);
+	transition: transform 0.3s linear;
+}
+
+.trans-scale-y.visible {
+	transform: scaleY(1);
+	transition: transform 0.3s linear;
+}
+
+.trans-scale-y {
+	transform: scaleY(0);
+	transition: transform 0.3s linear;
+}
+
+.trans-scale-x.visible {
+	transform: scaleX(1);
+	transition: transform 0.3s linear;
+}
+
+.trans-scale-x {
+	transform: scaleX(0);
+	transition: transform 0.3s linear;
+}
+
+/*
+* REPEATS
+*/
+.repeat-trans-scale-y.ng-leave {
+	transform: scaleY(1);
+	transition: transform 0.3s linear;
+}
+
+.repeat-trans-scale-y.ng-leave-active {
+	transform: scaleY(0);
+}
+
+.repeat-trans-scale-y.ng-enter {
+	transform: scaleY(1);
+	transition: transform 0.3s linear;
+}
+
+.repeat-trans-scale-y.ng-enter-active {
+	transform: scaleY(0);
+}
