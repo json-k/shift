@@ -11,7 +11,7 @@ The Gradle build (controlled by the gradle.properties) uses the following tasks:
  * **serviceUpdate** - rebuilds the WAR file (the running service will reload it).
  * **serviceDist** - creates a final ZIP file for distribution of the service.
 
-The typical (my) workflow for working on the service is to start it in the IDE, update the code and run the 'servieUpdate' task to reload it. This is designed to reflect the way the service runs in production.
+The typical (my) workflow for working on the service is to start it in the IDE, update the code and run the 'serviceUpdate' task to reload it. This is designed to reflect the way the service runs in production.
 
 ##Philosophy
 
