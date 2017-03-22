@@ -2,7 +2,7 @@
 
 A service based workflow tool with a web interface.
 
-##Gradle Build
+## Gradle Build
 
 The Gradle build (controlled by the gradle.properties) uses the following tasks:
 
@@ -13,7 +13,7 @@ The Gradle build (controlled by the gradle.properties) uses the following tasks:
 
 The typical (my) workflow for working on the service is to start it in the IDE, update the code and run the 'serviceUpdate' task to reload it. This is designed to reflect the way the service runs in production.
 
-##Philosophy
+## Philosophy
 
 A service of this type can be written using standard tools (it runs Embedded Apache) and distributed to a variety of operating systems. The distribution does not require a web-server and can be run with it's own memory requirements and in it's own process. I have been running services of this type for a variety of functions for many years.
 
